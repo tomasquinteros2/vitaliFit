@@ -24,6 +24,7 @@ const AdminPage = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [newFlavor, setNewFlavor] = useState('');
 
   // Verificar sesión al cargar
   useEffect(() => {
@@ -83,6 +84,7 @@ const AdminPage = () => {
   const handleEdit = (product: Product) => {
     setEditingProduct({ ...product });
     setSelectedFile(null);
+    setNewFlavor('');
   };
 
   const handleSave = async () => {
@@ -118,6 +120,7 @@ const AdminPage = () => {
     setEditingProduct(null);
     setIsCreating(false);
     setSelectedFile(null);
+    setNewFlavor('');
   };
 
   const handleCreate = () => {
@@ -134,6 +137,7 @@ const AdminPage = () => {
       inStock: true,
     });
     setSelectedFile(null);
+    setNewFlavor('');
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -321,32 +325,56 @@ const AdminPage = () => {
 
             {/* Sabores */}
             <div>
-              <label className="text-xs text-zinc-500 uppercase font-bold mb-1 block">
-                Sabores <span className="text-zinc-600 normal-case font-normal">(separados por coma, ej: Chocolate, Vainilla, Frutilla)</span>
-              </label>
-              <input
-                type="text"
-                value={(editingProduct.flavors || []).join(', ')}
-                onChange={(e) => {
-                  const raw = e.target.value;
-                  const arr = raw
-                    .split(',')
-                    .map((s) => s.trimStart())
-                    .filter((s) => s !== '');
-                  setEditingProduct({ ...editingProduct, flavors: arr });
-                }}
-                placeholder="Chocolate, Vainilla, Frutilla…"
-                className="w-full bg-zinc-800 p-3 rounded-lg border border-zinc-700 focus:outline-none focus:border-neon-green text-white"
-              />
+              <label className="text-xs text-zinc-500 uppercase font-bold mb-2 block">Sabores</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newFlavor}
+                  onChange={(e) => setNewFlavor(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const trimmed = newFlavor.trim();
+                      if (trimmed && !(editingProduct.flavors || []).includes(trimmed)) {
+                        setEditingProduct({ ...editingProduct, flavors: [...(editingProduct.flavors || []), trimmed] });
+                      }
+                      setNewFlavor('');
+                    }
+                  }}
+                  placeholder="Ej: Chocolate"
+                  className="flex-1 bg-zinc-800 p-3 rounded-lg border border-zinc-700 focus:outline-none focus:border-neon-green text-white"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const trimmed = newFlavor.trim();
+                    if (trimmed && !(editingProduct.flavors || []).includes(trimmed)) {
+                      setEditingProduct({ ...editingProduct, flavors: [...(editingProduct.flavors || []), trimmed] });
+                    }
+                    setNewFlavor('');
+                  }}
+                  className="px-4 py-2 bg-neon-green text-black font-bold rounded-lg hover:bg-neon-green/90 transition-colors flex items-center gap-1"
+                >
+                  <Plus size={18} />
+                </button>
+              </div>
               {(editingProduct.flavors || []).length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {(editingProduct.flavors || []).map((f) => (
-                    <span key={f} className="px-2 py-0.5 text-xs font-bold bg-zinc-700 text-zinc-200 rounded">
+                    <span key={f} className="flex items-center gap-1 px-2 py-1 text-xs font-bold bg-zinc-700 text-zinc-200 rounded-full">
                       {f}
+                      <button
+                        type="button"
+                        onClick={() => setEditingProduct({ ...editingProduct, flavors: (editingProduct.flavors || []).filter(fl => fl !== f) })}
+                        className="ml-1 text-zinc-400 hover:text-red-400 transition-colors"
+                      >
+                        <X size={12} />
+                      </button>
                     </span>
                   ))}
                 </div>
               )}
+              <p className="text-xs text-zinc-600 mt-1">Presioná Enter o el botón + para agregar cada sabor.</p>
             </div>
 
             {/* Image Upload Section */}
