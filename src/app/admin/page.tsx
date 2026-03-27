@@ -188,7 +188,7 @@ const AdminPage = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-zinc-800 border border-zinc-700 rounded-lg py-3 pl-10 pr-4 text-white focus:outline-none focus:border-neon-green transition-colors"
-                  placeholder="admin@vitalifit.com"
+                  placeholder="email@email.com"
                 />
               </div>
             </div>
